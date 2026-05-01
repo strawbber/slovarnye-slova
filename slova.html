@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр словарных слов — 3–5 классы (Эксперт)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(160deg, #f9efe2 0%, #f2dbb8 100%);
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: #fffdf7;
+            border-radius: 48px;
+            box-shadow: 0 30px 70px rgba(120, 70, 15, 0.2);
+            padding: 30px 22px 28px;
+            max-width: 780px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid #e2c69b;
+            position: relative;
+        }
+        .difficulty-panel {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        .diff-btn {
+            background: #fff6e8;
+            border: 2px solid #c9a77b;
+            padding: 9px 16px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #5e3e1c;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+            background: #f7ecdb;
+            white-space: nowrap;
+        }
+        .diff-btn.active {
+            background: #dba54b;
+            border-color: #8b5a2b;
+            color: white;
+            box-shadow: 0 6px 14px rgba(180, 110, 20, 0.35);
+            transform: scale(1.02);
+        }
+        .diff-btn:hover {
+            background: #edd2ac;
+            border-color: #a8763e;
+        }
+        .diff-btn.expert-btn {
+            background: #fae6d2;
+            border-color: #b5713a;
+            color: #582f0e;
+        }
+        .diff-btn.expert-btn.active {
+            background: #b9450e;
+            border-color: #702e0c;
+            color: #fff7e6;
+            box-shadow: 0 6px 16px rgba(160, 70, 0, 0.5);
+        }
+        h1 {
+            font-size: 2rem;
+            color: #553818;
+            margin-bottom: 5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        h1 span {
+            background: #f1d7a7;
+            padding: 4px 18px;
+            border-radius: 30px;
+            font-size: 1rem;
+            color: #4a3112;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 5px 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .progress {
+            background: #e9d2b0;
+            height: 14px;
+            border-radius: 20px;
+            flex: 2;
+            min-width: 120px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #c18f2e;
+            height: 100%;
+            width: 0%;
+            border-radius: 20px;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px #e7b64b;
+        }
+        .score-box {
+            background: #f3e5d0;
+            border-radius: 25px;
+            padding: 6px 18px;
+            font-weight: 700;
+            color: #4a351b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.1rem;
+        }
+        .word-card {
+            background: #fef9f0;
+            border: 2px dashed #cfaa70;
+            border-radius: 60px;
+            padding: 28px 15px;
+            margin: 10px 0 24px;
+        }
+        .word-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #4b3820;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        .underline-letter {
+            display: inline-block;
+            border-bottom: 5px solid #bf7b2c;
+            margin: 0 4px;
+            padding: 0 7px;
+            min-width: 50px;
+            color: #b6490e;
+            background: #ffedcf;
+            border-radius: 12px;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 22px;
+            margin: 25px 0 18px;
+        }
+        .letter-btn {
+            background: #ffffff;
+            border: 3px solid #bc8f64;
+            border-radius: 30px;
+            width: 80px;
+            height: 80px;
+            font-size: 2.7rem;
+            font-weight: bold;
+            color: #4f3218;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 6px 0 #aa7e56;
+            background: #fef3e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+        .letter-btn:hover {
+            background: #f8e2bf;
+            border-color: #a86f32;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #946e3b;
+        }
+        .letter-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #75562c;
+        }
+        .letter-btn.correct-highlight {
+            background: #b1d89b;
+            border-color: #2f6321;
+            color: #1a3f0c;
+            box-shadow: 0 0 22px #85c34a;
+        }
+        .letter-btn.wrong-highlight {
+            background: #f4a5b0;
+            border-color: #b0273a;
+            color: #631515;
+            box-shadow: 0 0 15px #d15454;
+        }
+        .message {
+            font-size: 1.3rem;
+            font-weight: 600;
+            min-height: 42px;
+            color: #4d3a20;
+            margin: 8px 0 12px;
+        }
+        .restart-btn {
+            background: #f5e9d3;
+            border: 2px solid #b58954;
+            font-size: 1rem;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: bold;
+            color: #4f3920;
+            cursor: pointer;
+            transition: 0.2s;
+            letter-spacing: 0.5px;
+            margin-top: 8px;
+        }
+        .restart-btn:hover {
+            background: #e5cca8;
+            border-color: #8a5d31;
+        }
+        .completed-message {
+            color: #276112;
+            font-weight: bold;
+        }
+        .expert-badge {
+            background: #c24a1a;
+            color: #ffecd7;
+            font-size: 0.8rem;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-left: 5px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+        }
+        @media (max-width: 550px) {
+            .word-display {
+                font-size: 2.2rem;
+                letter-spacing: 3px;
+            }
+            .letter-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+            .diff-btn {
+                padding: 7px 10px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Словарный тренажёр <span>3–5 кл.</span></h1>
+
+        <div class="difficulty-panel" id="difficultyPanel">
+            <button class="diff-btn active" data-level="easy">🌱 3–4 класс</button>
+            <button class="diff-btn" data-level="medium">🌿 5 класс</button>
+            <button class="diff-btn" data-level="hard">🌳 Смешанные</button>
+            <button class="diff-btn expert-btn" data-level="expert">⭐ Эксперт</button>
+        </div>
+
+        <div class="stats">
+            <div class="progress">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+            <div class="score-box">
+                <span>✅</span> <span id="scoreText">0/0</span>
+            </div>
+        </div>
+
+        <div class="word-card">
+            <div class="word-display" id="wordDisplay"></div>
+        </div>
+
+        <div class="options" id="optionsContainer"></div>
+        <div class="message" id="messageBox"></div>
+
+        <button class="restart-btn" id="restartButton">🔄 Пройти заново</button>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- БАЗЫ СЛОВ (расширенные) ----------
+            const easyWords = [
+                { word: "в...робей", missing: "о", options: ["о","а"] },
+                { word: "с...бака", missing: "о", options: ["о","а"] },
+                { word: "к...рова", missing: "о", options: ["о","а"] },
+                { word: "м...дведь", missing: "е", options: ["е","и"] },
+                { word: "уч...ник", missing: "е", options: ["е","и"] },
+                { word: "п...нал", missing: "е", options: ["е","и"] },
+                { word: "т...традь", missing: "е", options: ["е","и"] },
+                { word: "р...бята", missing: "е", options: ["е","и"] },
+                { word: "д...журный", missing: "е", options: ["е","и"] },
+                { word: "за...ц", missing: "я", options: ["я","е","и"] },
+                { word: "л...сица", missing: "и", options: ["и","е"] },
+                { word: "мес...ц", missing: "я", options: ["я","е"] },
+                { word: "...зык", missing: "я", options: ["я","е","и"] },
+                { word: "гор...д", missing: "о", options: ["о","а"] },
+                { word: "ул...ца", missing: "и", options: ["и","е"] },
+                { word: "р...бота", missing: "а", options: ["а","о"] },
+                { word: "м...шина", missing: "а", options: ["а","о"] },
+                { word: "к...ртина", missing: "а", options: ["а","о"] },
+                { word: "п...тух", missing: "е", options: ["е","и"] },
+                { word: "дев...чка", missing: "о", options: ["о","а"] },
+                { word: "м...локо", missing: "о", options: ["о","а"] },
+                { word: "в...рона", missing: "о", options: ["о","а"] },
+                { word: "с...рока", missing: "о", options: ["о","а"] }
+            ];
+
+            const mediumWords = [
+                { word: "б...седа", missing: "е", options: ["е","и","я"] },
+                { word: "в...кзал", missing: "о", options: ["о","а"] },
+                { word: "г...рой", missing: "е", options: ["е","и"] },
+                { word: "д...ректор", missing: "и", options: ["и","е"] },
+                { word: "инж...нер", missing: "е", options: ["е","и"] },
+                { word: "к...бинет", missing: "а", options: ["а","о"] },
+                { word: "п...ртрет", missing: "о", options: ["о","а"] },
+                { word: "с...лют", missing: "а", options: ["а","о"] },
+                { word: "т...перь", missing: "е", options: ["е","и"] },
+                { word: "ф...нтан", missing: "о", options: ["о","а"] },
+                { word: "х...зяин", missing: "о", options: ["о","а"] },
+                { word: "ш...фёр", missing: "о", options: ["о","а"] },
+                { word: "ябл...ко", missing: "о", options: ["о","а"] },
+                { word: "в...л...сипед", missing: "е", options: ["е","и"] },
+                { word: "б...тинки", missing: "о", options: ["о","а"] },
+                { word: "г...зета", missing: "а", options: ["а","о"] },
+                { word: "д...льфин", missing: "е", options: ["е","и"] },
+                { word: "ж...лать", missing: "е", options: ["е","и"] },
+                { word: "к...нфета", missing: "о", options: ["о","а"] },
+                { word: "л...ловый", missing: "и", options: ["и","е"] },
+                { word: "м...ршрут", missing: "а", options: ["а","о"] },
+                { word: "р...бина", missing: "я", options: ["я","и","е"] },
+                { word: "с...крет", missing: "е", options: ["е","и"] },
+                { word: "т...атр", missing: "е", options: ["е","и"] },
+                { word: "б...гровый", missing: "а", options: ["а","о"] },
+                { word: "к...никулы", missing: "а", options: ["а","о"] },
+                { word: "п...йзаж", missing: "е", options: ["е","и"] },
+                { word: "р...мень", missing: "е", options: ["е","и"] },
+                { word: "св...ркать", missing: "е", options: ["е","и"] },
+                { word: "т...желый", missing: "я", options: ["я","е","и"] }
+            ];
+
+            // Экспертные слова: два пропуска (первый и второй), нужно выбрать обе буквы последовательно
+            const expertWords = [
+                { word: "в...л...сипед", missing: ["е","о"], options: [ ["е","и"], ["о","а"] ] },
+                { word: "б...гр...вый", missing: ["а","о"], options: [ ["а","о"], ["о","а"] ] },
+                { word: "д...рект...р", missing: ["и","о"], options: [ ["и","е"], ["о","а"] ] },
+                { word: "инж...н...р", missing: ["е","е"], options: [ ["е","и"], ["е","и"] ] },
+                { word: "к...б...нет", missing: ["а","и"], options: [ ["а","о"], ["и","е"] ] },
+                { word: "п...ртр...т", missing: ["о","е"], options: [ ["о","а"], ["е","и"] ] },
+                { word: "с...кр...т", missing: ["е","е"], options: [ ["е","и"], ["е","и"] ] },
+                { word: "ф...нт...н", missing: ["о","а"], options: [ ["о","а"], ["а","о"] ] },
+                { word: "х...зя...н", missing: ["о","и"], options: [ ["о","а"], ["и","е"] ] },
+                { word: "м...ршр...т", missing: ["а","у"], options: [ ["а","о"], ["у","ю"] ] },
+                { word: "г...з...та", missing: ["а","е"], options: [ ["а","о"], ["е","и"] ] },
+                { word: "б...т...нки", missing: ["о","и"], options: [ ["о","а"], ["и","е"] ] },
+                { word: "к...нф...та", missing: ["о","е"], options: [ ["о","а"], ["е","и"] ] },
+                { word: "л...л...вый", missing: ["и","о"], options: [ ["и","е"], ["о","а"] ] },
+                { word: "п...йз...ж", missing: ["е","а"], options: [ ["е","и"], ["а","о"] ] },
+                { word: "р...б...на", missing: ["я","и"], options: [ ["я","и"], ["и","е"] ] },
+                { word: "св...рк...ть", missing: ["е","а"], options: [ ["е","и"], ["а","о"] ] },
+                { word: "т...ж...лый", missing: ["я","ё"], options: [ ["я","е"], ["ё","о"] ] },
+                { word: "в...кз...л", missing: ["о","а"], options: [ ["о","а"], ["а","о"] ] },
+                { word: "с...л...т", missing: ["а","ю"], options: [ ["а","о"], ["ю","у"] ] }
+            ];
+
+            // Смешанные — все обычные слова (3-5 классы, без экспертных)
+            const allWords = [...easyWords, ...mediumWords];
+
+            // ----- СОСТОЯНИЕ -----
+            let currentLevel = 'easy';
+            let wordPool = [];
+            let shuffledWords = [];
+            let currentIndex = 0;
+            let correctCount = 0;
+            let totalWords = 0;
+            let answered = false;
+
+            // Для экспертного режима: двухшаговый ответ
+            let expertStep = 0;            // 0 = первая буква, 1 = вторая
+            let currentExpertWord = null;
+            let expertFirstCorrect = false;
+
+            // DOM
+            const difficultyButtons = document.querySelectorAll('.diff-btn');
+            const wordDisplay = document.getElementById('wordDisplay');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const messageBox = document.getElementById('messageBox');
+            const progressFill = document.getElementById('progressFill');
+            const scoreText = document.getElementById('scoreText');
+            const restartBtn = document.getElementById('restartButton');
+
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
+            function setWordPool(level) {
+                if (level === 'easy') wordPool = [...easyWords];
+                else if (level === 'medium') wordPool = [...mediumWords];
+                else if (level === 'hard') wordPool = [...allWords];
+                else if (level === 'expert') wordPool = [...expertWords];
+                else wordPool = [...easyWords];
+            }
+
+            function updateProgressUI() {
+                const percent = totalWords > 0 ? (currentIndex / totalWords) * 100 : 0;
+                progressFill.style.width = `${percent}%`;
+                scoreText.textContent = `${correctCount}/${totalWords}`;
+            }
+
+            // Универсальная отрисовка (обычная / эксперт)
+            function renderWord() {
+                if (currentIndex >= totalWords) {
+                    wordDisplay.innerHTML = '🎉 Превосходно!';
+                    optionsContainer.innerHTML = '';
+                    messageBox.innerHTML = '<span class="completed-message">Все слова пройдены!</span>';
+                    progressFill.style.width = '100%';
+                    scoreText.textContent = `${correctCount}/${totalWords}`;
+                    return;
+                }
+
+                const wordObj = shuffledWords[currentIndex];
+
+                // Проверяем, экспертный ли режим
+                if (currentLevel === 'expert' && Array.isArray(wordObj.missing)) {
+                    // Экспертный режим
+                    currentExpertWord = wordObj;
+                    expertStep = 0;
+                    expertFirstCorrect = false;
+                    renderExpertStep(wordObj, 0);
+                } else {
+                    // Обычный режим (один пропуск)
+                    currentExpertWord = null;
+                    renderSimpleWord(wordObj);
+                }
+                answered = false;
+            }
+
+            function renderSimpleWord(wordObj) {
+                const displayHtml = wordObj.word.replace('...', '<span class="underline-letter">_</span>');
+                wordDisplay.innerHTML = displayHtml;
+
+                optionsContainer.innerHTML = '';
+                const shuffledOptions = shuffleArray([...wordObj.options]);
+                shuffledOptions.forEach(letter => {
+                    const btn = document.createElement('div');
+                    btn.className = 'letter-btn';
+                    btn.textContent = letter.toUpperCase();
+                    btn.addEventListener('click', (e) => handleSimpleAnswer(letter, btn, wordObj));
+                    optionsContainer.appendChild(btn);
+                });
+                messageBox.textContent = 'Выбери пропущенную букву ✏️';
+            }
+
+            function renderExpertStep(wordObj, step) {
+                // step 0 – первый пропуск, step 1 – второй
+                const missingArray = wordObj.missing; // массив из двух букв
+                const optionsArray = wordObj.options; // массив массивов
+
+                let displayHtml = wordObj.word;
+                if (step === 0) {
+                    // Первый пропуск показываем как подчеркивание, второй остаётся троеточием
+                    displayHtml = displayHtml.replace('...', '<span class="underline-letter">_</span>');
+                } else {
+                    // Первая уже вставлена (правильная буква), второй пропуск подчеркнут
+                    const firstLetter = missingArray[0];
+                    displayHtml = displayHtml.replace('...', `<span style="color:#2d6a4f; font-weight:bold;">${firstLetter}</span>`);
+                    displayHtml = displayHtml.replace('...', '<span class="underline-letter">_</span>');
+                }
+                wordDisplay.innerHTML = displayHtml;
+
+                // Показываем варианты для текущего шага
+                const currentOptions = optionsArray[step];
+                const shuffledOpts = shuffleArray([...currentOptions]);
+                optionsContainer.innerHTML = '';
+                shuffledOpts.forEach(letter => {
+                    const btn = document.createElement('div');
+                    btn.className = 'letter-btn';
+                    btn.textContent = letter.toUpperCase();
+                    btn.addEventListener('click', (e) => handleExpertAnswer(letter, btn, wordObj, step));
+                    optionsContainer.appendChild(btn);
+                });
+
+                if (step === 0) {
+                    messageBox.innerHTML = 'Выбери <strong>первую</strong> пропущенную букву 1️⃣';
+                } else {
+                    messageBox.innerHTML = 'Теперь <strong>вторую</strong> букву 2️⃣';
+                }
+            }
+
+            function handleSimpleAnswer(selectedLetter, clickedBtn, wordObj) {
+                if (answered) return;
+                answered = true;
+
+                const isCorrect = (selectedLetter === wordObj.missing);
+                highlightAllButtons(wordObj.missing, selectedLetter, clickedBtn, isCorrect);
+                showSimpleResult(wordObj, isCorrect);
+
+                updateProgressUI();
+                scheduleNextWord();
+            }
+
+            function handleExpertAnswer(selectedLetter, clickedBtn, wordObj, step) {
+                if (answered && step === expertStep) return;
+                // Блокируем повтор внутри одного шага
+                const missingArray = wordObj.missing;
+
+                if (step === 0) {
+                    // Первая буква
+                    const isFirstCorrect = (selectedLetter === missingArray[0]);
+                    // Подсветим только кнопки первого шага
+                    highlightExpertStepButtons(missingArray[0], selectedLetter, clickedBtn, isFirstCorrect, 0);
+
+                    if (isFirstCorrect) {
+                        expertFirstCorrect = true;
+                        // Переходим ко второму шагу через небольшую паузу
+                        setTimeout(() => {
+                            expertStep = 1;
+                            renderExpertStep(wordObj, 1);
+                            answered = false;
+                        }, 800);
+                    } else {
+                        // Ошибка на первом шаге – завершаем слово как неверное
+                        answered = true;
+                        expertFirstCorrect = false;
+                        showExpertFailResult(wordObj, 0);
+                        updateProgressUI();
+                        scheduleNextWord();
+                    }
+                } else if (step === 1) {
+                    // Вторая буква
+                    const isSecondCorrect = (selectedLetter === missingArray[1]);
+                    highlightExpertStepButtons(missingArray[1], selectedLetter, clickedBtn, isSecondCorrect, 1);
+                    answered = true;
+
+                    if (expertFirstCorrect && isSecondCorrect) {
+                        correctCount++;
+                        showExpertSuccessResult(wordObj);
+                    } else {
+                        showExpertFailResult(wordObj, 1);
+                    }
+                    updateProgressUI();
+                    scheduleNextWord();
+                }
+            }
+
+            function highlightAllButtons(correctLetter, selectedLetter, clickedBtn, isCorrect) {
+                const allButtons = document.querySelectorAll('.letter-btn');
+                allButtons.forEach(btn => {
+                    btn.style.pointerEvents = 'none';
+                    if (btn.textContent.toLowerCase() === correctLetter) {
+                        btn.classList.add('correct-highlight');
+                    }
+                });
+                if (isCorrect) {
+                    clickedBtn.classList.add('correct-highlight');
+                } else {
+                    clickedBtn.classList.add('wrong-highlight');
+                }
+            }
+
+            function highlightExpertStepButtons(correctLetter, selectedLetter, clickedBtn, isCorrect, step) {
+                const allButtons = document.querySelectorAll('.letter-btn');
+                allButtons.forEach(btn => {
+                    btn.style.pointerEvents = 'none';
+                    if (btn.textContent.toLowerCase() === correctLetter) {
+                        btn.classList.add('correct-highlight');
+                    }
+                });
+                if (isCorrect) {
+                    clickedBtn.classList.add('correct-highlight');
+                } else {
+                    clickedBtn.classList.add('wrong-highlight');
+                }
+            }
+
+            function showSimpleResult(wordObj, isCorrect) {
+                if (isCorrect) {
+                    correctCount++;
+                    messageBox.innerHTML = '✅ Верно!';
+                    const filled = wordObj.word.replace('...', `<span style="color:#2d6a4f; font-weight:bold;">${wordObj.missing}</span>`);
+                    wordDisplay.innerHTML = filled;
+                } else {
+                    messageBox.innerHTML = `❌ Ошибка. Верная буква: <strong>${wordObj.missing.toUpperCase()}</strong>`;
+                    const filled = wordObj.word.replace('...', `<span style="color:#b0413b; font-weight:bold;">${wordObj.missing}</span>`);
+                    wordDisplay.innerHTML = filled;
+                }
+            }
+
+            function showExpertSuccessResult(wordObj) {
+                const missing = wordObj.missing;
+                let filledHtml = wordObj.word;
+                filledHtml = filledHtml.replace('...', `<span style="color:#2d6a4f; font-weight:bold;">${missing[0]}</span>`);
+                filledHtml = filledHtml.replace('...', `<span style="color:#2d6a4f; font-weight:bold;">${missing[1]}</span>`);
+                wordDisplay.innerHTML = filledHtml;
+                messageBox.innerHTML = '✅ Отлично! Обе буквы верны.';
+            }
+
+            function showExpertFailResult(wordObj, failedStep) {
+                const missing = wordObj.missing;
+                let filledHtml = wordObj.word;
+                const color1 = failedStep === 0 ? '#b0413b' : '#2d6a4f';
+                const color2 = failedStep === 1 ? '#b0413b' : '#2d6a4f';
+                filledHtml = filledHtml.replace('...', `<span style="color:${color1}; font-weight:bold;">${missing[0]}</span>`);
+                filledHtml = filledHtml.replace('...', `<span style="color:${color2}; font-weight:bold;">${missing[1]}</span>`);
+                wordDisplay.innerHTML = filledHtml;
+                messageBox.innerHTML = `❌ Неверно. Правильно: <strong>${missing[0].toUpperCase()}</strong> и <strong>${missing[1].toUpperCase()}</strong>`;
+            }
+
+            function scheduleNextWord() {
+                setTimeout(() => {
+                    currentIndex++;
+                    updateProgressUI();
+                    renderWord();
+                }, 1900);
+            }
+
+            function startGame() {
+                setWordPool(currentLevel);
+                shuffledWords = shuffleArray([...wordPool]);
+                totalWords = shuffledWords.length;
+                currentIndex = 0;
+                correctCount = 0;
+                answered = false;
+                expertStep = 0;
+                currentExpertWord = null;
+                expertFirstCorrect = false;
+                updateProgressUI();
+                renderWord();
+            }
+
+            function changeLevel(level) {
+                if (level === currentLevel) return;
+                currentLevel = level;
+                difficultyButtons.forEach(btn => {
+                    const btnLevel = btn.getAttribute('data-level');
+                    btn.classList.toggle('active', btnLevel === level);
+                });
+                startGame();
+            }
+
+            difficultyButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const level = e.currentTarget.getAttribute('data-level');
+                    changeLevel(level);
+                });
+            });
+
+            restartBtn.addEventListener('click', () => startGame());
+
+            startGame();
+        })();
+    </script>
+</body>
+</html>
